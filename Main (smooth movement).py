@@ -48,6 +48,7 @@ def ok(x, a, b, board,
 class Map:
     # создание поля
     def __init__(self, width, height):  # высота, ширина
+        self.boomarea = False
         self.points = 0
         self.time = 0
         self.dethtime = 120
@@ -107,7 +108,7 @@ class Map:
         # print(len(self.enemy), height * width // 19)
 
         self.board[1][1] = 1  # персонаж
-        self.pers = [1, 1]  # координаты персонажа
+        self.pers = [1, 1, 0, 0]  # координаты персонажа
 
         self.bomb = False
         self.boom = False
@@ -125,6 +126,20 @@ class Map:
         self.cell_size = cell_size
 
     def render(self):
+        self.board[self.pers[0]][self.pers[1]] = 0
+        if self.pers[2] > self.cell_size - 1:
+            self.pers[2] = 0
+            self.pers[0] += 1
+        elif self.pers[2] < -self.cell_size - 1:
+            self.pers[2] = 0
+            self.pers[0] -= 1
+        if self.pers[3] > self.cell_size - 1:
+            self.pers[3] = 0
+            self.pers[1] += 1
+        elif self.pers[3] < -self.cell_size - 1:
+            self.pers[3] = 0
+            self.pers[1] -= 1
+        self.board[self.pers[0]][self.pers[1]] = 1
         self.time += 1
         zeroenemy = self.enemy[0]
         self.fps = (self.fps + 1) % self.fpsall
@@ -250,14 +265,15 @@ class Map:
         if self.dethtime - (self.time - 1) // self.fpsall == 0:
             pygame.quit()
         else:
-            font = pygame.font.Font("18999.otf", 20)
+            font = pygame.font.Font("18999.otf", self.cell_size // 10 * 9)
             text = font.render(
                 'HP:' + str(self.life) + '  number of bombs: ' + str(
                     self.bonus1 + 1) + '  blast radius: ' + str(
                     self.bonus2 + 1) + '  time: ' + str(
-                    self.dethtime - self.time // self.fpsall) + '  Points: ' + str(self.points), 1,
+                    self.dethtime - self.time // self.fpsall) + '  Points: ' + str(
+                    self.points), 1,
                 (250, 250, 250))
-            screen.blit(text, (0, 0))
+            screen.blit(text, (10, self.cell_size // 2))
 
         for i in range(len(a)):
             for j in range(len(a[i])):
@@ -276,10 +292,34 @@ class Map:
                             self.top + i * self.cell_size,
                             self.left + j * self.cell_size, self.cell_size,
                             self.cell_size), 1)
-                        pygame.draw.circle(screen, (80, 80, 255), (
-                            self.top + i * self.cell_size + self.cell_size // 2,
-                            self.left + j * self.cell_size + self.cell_size // 2),
-                                           self.cell_size // 2 - 2, self.cell_size // 7)
+                        # pygame.draw.circle(screen, (80, 80, 255), (
+                        #     self.top + i * self.cell_size + self.cell_size // 2 +
+                        #     self.pers[2],
+                        #     self.left + j * self.cell_size + self.cell_size // 2 +
+                        #     self.pers[3]),
+                        #                    self.cell_size // 2 - 2,
+                        #                    self.cell_size // 7)
+                        # if self.pers[2] > 0:
+
+                        # hero = pygame.image.load('BOMBER.png')
+                        # hero = pygame.transform.scale(hero, (self.cell_size, self.cell_size))
+                        # hero_rect = hero.get_rect(center=(
+                        #     self.top + i * self.cell_size + self.cell_size // 2 +
+                        #     self.pers[2],
+                        #     self.left + j * self.cell_size + self.cell_size // 2 +
+                        #     self.pers[3]))
+                        # screen.blit(hero, (
+                        #     self.top + i * self.cell_size + self.cell_size // 2 +
+                        #     self.pers[2],
+                        #     self.left + j * self.cell_size + self.cell_size // 2 +
+                        #     self.pers[3]), (0, 0, 29, 29))
+
+                        hero = pygame.image.load('76829.png')
+                        # hero_rect = hero.get_rect(center=(self.top + i * self.cell_size + self.cell_size // 2, self.left + j * self.cell_size + self.cell_size // 2))
+                        hero_rect = (
+                        self.top + i * self.cell_size + self.cell_size // 2 - 29 // 2 + 5,
+                        self.left + j * self.cell_size + self.cell_size // 2 - 29 // 2 + 3)
+                        screen.blit(hero, hero_rect, (0, 0, 29, 29))
                     elif self.board[i][j] == -1:
                         pygame.draw.rect(screen, (100, 100, 100), (
                             self.top + i * self.cell_size,
@@ -295,20 +335,35 @@ class Map:
                             self.cell_size))
 
                     elif self.board[i][j] == 5:
-                        pygame.draw.rect(screen, (200, 20, 20), (
+                        bonus1 = pygame.image.load("+1bomb.png").convert()
+                        bonus1 = pygame.transform.scale(bonus1, (
+                        self.cell_size, self.cell_size))
+                        bonus1_rect = (
                             self.top + i * self.cell_size,
                             self.left + j * self.cell_size, self.cell_size,
-                            self.cell_size))
+                            self.cell_size)
+                        screen.blit(bonus1, bonus1_rect)
                     elif self.board[i][j] == 6:
-                        pygame.draw.rect(screen, (250, 200, 20), (
+                        bonus2 = pygame.image.load("+1radius.png").convert()
+                        bonus2 = pygame.transform.scale(bonus2, (self.cell_size, self.cell_size))
+                        bonus2_rect = (
                             self.top + i * self.cell_size,
                             self.left + j * self.cell_size, self.cell_size,
-                            self.cell_size))
+                            self.cell_size)
+                        screen.blit(bonus2, bonus2_rect)
                     elif self.board[i][j] == 7:
-                        pygame.draw.rect(screen, (0, 0, 200), (
+                        # pygame.draw.rect(screen, (0, 0, 200), (
+                        #     self.top + i * self.cell_size,
+                        #     self.left + j * self.cell_size, self.cell_size,
+                        #     self.cell_size))
+                        exit = pygame.image.load("door.png").convert()
+                        exit = pygame.transform.scale(exit, (
+                        self.cell_size, self.cell_size))
+                        exit_rect = (
                             self.top + i * self.cell_size,
                             self.left + j * self.cell_size, self.cell_size,
-                            self.cell_size))
+                            self.cell_size)
+                        screen.blit(exit, exit_rect)
 
                     elif self.board[i][j] == 3:
                         # pygame.draw.rect(screen, (200, 20, 20), (
@@ -334,17 +389,22 @@ class Map:
                                         ey = 1
                                     break
 
+                        enemy = pygame.image.load("76829.png")
+                        enemy_rect = (
+                            self.top + i * self.cell_size + self.cell_size // 2 + ex * (
+                                    self.cell_size // self.fpsall * self.fps) - 29 // 2,
+                            self.left + j * self.cell_size + self.cell_size // 2 + ey * (
+                                    self.cell_size // self.fpsall * self.fps) - 29 // 2)
+                        en = [(0, 29 * 4, 29, 29), (29, 29 * 4, 29, 29),
+                              (29 * 2, 29 * 4, 29, 29)]
                         pygame.draw.rect(screen, (200, 200, 200), (
                             self.top + i * self.cell_size,
                             self.left + j * self.cell_size, self.cell_size,
                             self.cell_size), 1)
-                        pygame.draw.circle(screen, (200, 20, 20), (
-                            self.top + i * self.cell_size + self.cell_size // 2 + ex * (
-                                    self.cell_size // self.fpsall * self.fps),
-                            self.left + j * self.cell_size + self.cell_size // 2 + ey * (
-                                    self.cell_size // self.fpsall * self.fps)),
-                                           self.cell_size // 2 - 2, self.cell_size // 7)
-                else:
+                        screen.blit(enemy, enemy_rect, en[
+                            (self.fps // (self.fpsall // 9) - 1) % 3])
+
+            else:
                     pygame.quit()
         if self.bomb:
             for b in self.bomb:
@@ -353,41 +413,131 @@ class Map:
                         self.top + b[0] * self.cell_size,
                         self.left + b[1] * self.cell_size, self.cell_size,
                         self.cell_size), 1)
-                    pygame.draw.circle(screen, (0, 0, 0), (
-                        self.top + b[0] * self.cell_size + self.cell_size // 2,
+                    bomb = pygame.image.load("76829.png")
+                    bomb_rect = (
+                        self.top + b[
+                            0] * self.cell_size + self.cell_size // 2 - 29 // 2,
                         self.left + b[
-                            1] * self.cell_size + self.cell_size // 2),
-                                       self.cell_size // 4 - 2)
+                            1] * self.cell_size + self.cell_size // 2 - 29 // 2)
+                    screen.blit(bomb, bomb_rect, (29 * 6, 29 * 3, 29, 29))
+
+    def get_cell(self, pos):
+        y = pos[0] - self.top
+        x = pos[1] - self.left
+        if 0 <= x <= self.width * self.cell_size and 0 <= y <= self.height * self.cell_size:
+            for i in range(self.height):
+                for j in range(self.width):
+                    # print(x, y, i, j)
+                    if j * self.cell_size <= x <= (
+                            j + 1) * self.cell_size and i * self.cell_size <= y <= (
+                            i + 1) * self.cell_size:
+                        return [i, j]
+        else:
+            return None
 
     def keyd(self, key):
         a = self.pers.copy()
-        kk = [[pygame.K_RIGHT, pygame.K_d, [a[0] + 1, a[1]]],
-              [pygame.K_LEFT, pygame.K_a, [a[0] - 1, a[1]]],
-              [pygame.K_UP, pygame.K_w, [a[0], a[1] - 1]],
-              [pygame.K_DOWN, pygame.K_s, [a[0], a[1] + 1]]]
-        for i in kk:
+        kk = [[pygame.K_RIGHT, pygame.K_d, [a[0] + 1, a[1]], 1],
+              [pygame.K_LEFT, pygame.K_a, [a[0] - 1, a[1]], 2],
+              [pygame.K_UP, pygame.K_w, [a[0], a[1] - 1], 3],
+              [pygame.K_DOWN, pygame.K_s, [a[0], a[1] + 1], 4]]
+        for j in range(len(kk)):
+            i = kk[j]
+            if type(self.bomb) != list:
+                bb = [self.bomb]
+            else:
+                bb = self.bomb.copy()
+            cell1 = self.get_cell((
+                            self.top + i[2][0] * self.cell_size + self.cell_size // 2 +
+                            self.pers[2],
+                            self.left + i[2][1] * self.cell_size + self.cell_size // 2 +
+                            self.pers[3]))
+            cell2 = self.get_cell((
+                            self.top + i[2][0] * self.cell_size + self.cell_size // 2 +
+                            self.pers[2],
+                            self.left + i[2][1] * self.cell_size + self.cell_size // 2 +
+                            self.pers[3]))
+            cell3 = self.get_cell((
+                            self.top + i[2][0] * self.cell_size + self.cell_size // 2 +
+                            self.pers[2],
+                            self.left + i[2][1] * self.cell_size + self.cell_size // 2 +
+                            self.pers[3]))
+            cell4 = self.get_cell((
+                            self.top + i[2][0] * self.cell_size + self.cell_size // 2 +
+                            self.pers[2],
+                            self.left + i[2][1] * self.cell_size + self.cell_size // 2 +
+                            self.pers[3]))
+            cell = [cell1, cell2, cell3, cell4]
             if (key == i[0] or key == i[1]) and self.board[i[2][0]][
-                i[2][1]] in [0, 3, 5, 6, 7]:
+                i[2][1]] in [0, 3, 5, 6, 7, 1] and i[2] not in bb:
+                print(cell, '\t', self.board[cell1[0]][cell1[1]], self.board[cell2[0]][cell2[1]], self.board[cell3[0]][cell3[1]],self.board[cell4[0]][cell4[1]])
+            if (key == i[0] or key == i[1]) and self.board[cell[j][0]][
+                cell[j][1]] in [1, 0, 3, 5, 6, 7] and cell[j] not in bb:
                 if self.board[i[2][0]][i[2][1]] == 3:
                     self.gamecon = False
                     print('THE END')
                 elif self.board[i[2][0]][i[2][1]] == 5:
                     self.bonus1 += 1
-                    self.board[a[0]][a[1]] = 0
-                    self.pers = i[2]
-                    self.board[i[2][0]][i[2][1]] = 1
+                    # self.board[a[0]][a[1]] = 0
+                    # self.pers = i[2]
+                    # self.board[i[2][0]][i[2][1]] = 1
+
+                    ex = 0
+                    ey = 0
+                    if i[3] == 1:
+                        ex = self.cell_size // 5
+                        ey = 0
+                    elif i[3] == 2:
+                        ex = -self.cell_size // 5
+                        ey = 0
+                    elif i[3] == 3:
+                        ex = 0
+                        ey = -self.cell_size // 5
+                    elif i[3] == 4:
+                        ex = 0
+                        ey = self.cell_size // 5
+                    self.pers[2] += ex
+                    self.pers[3] += ey
                 elif self.board[i[2][0]][i[2][1]] == 6:
                     self.bonus2 += 1
-                    self.board[a[0]][a[1]] = 0
-                    self.pers = i[2]
-                    self.board[i[2][0]][i[2][1]] = 1
+                    ex = 0
+                    ey = 0
+                    if i[3] == 1:
+                        ex = self.cell_size // 5
+                        ey = 0
+                    elif i[3] == 2:
+                        ex = -self.cell_size // 5
+                        ey = 0
+                    elif i[3] == 3:
+                        ex = 0
+                        ey = -self.cell_size // 5
+                    elif i[3] == 4:
+                        ex = 0
+                        ey = self.cell_size // 5
+                    self.pers[2] += ex
+                    self.pers[3] += ey
                 elif self.board[i[2][0]][i[2][1]] == 7:
-                    print('You win!')
-                    self.gamecon = False
+                    if self.points > 500:
+                        print('You win!')
+                        self.gamecon = False
+
                 else:
-                    self.board[a[0]][a[1]] = 0
-                    self.pers = i[2]
-                    self.board[i[2][0]][i[2][1]] = 1
+                    ex = 0
+                    ey = 0
+                    if i[3] == 1:
+                        ex = self.cell_size // 5
+                        ey = 0
+                    elif i[3] == 2:
+                        ex = - self.cell_size // 5
+                        ey = 0
+                    elif i[3] == 3:
+                        ex = 0
+                        ey = - self.cell_size // 5
+                    elif i[3] == 4:
+                        ex = 0
+                        ey = self.cell_size // 5
+                    self.pers[2] += ex
+                    self.pers[3] += ey
             elif key == pygame.K_SPACE:
                 if self.bomb:
                     if self.pers not in self.bomb:
@@ -408,18 +558,27 @@ x = q.width() * q.height() // 42500
 fps = x  # количество кадров в секунду
 clock = pygame.time.Clock()
 pygame.init()
-size = width, height = 35 * x, 14 * x
+size = width, height = 35 * x, 15 * x
 board = Map(13, 35)
-board.set_view(40, 0, x, x)
+board.set_view(x * 2, 0, x, x)
 screen = pygame.display.set_mode(size)
 screen.fill((150, 150, 150))
 running = True
+kdown = False
+key = False
 while running and board.gamecon:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.KEYDOWN:
-            board.keyd(event.key)
+            kdown = True
+            key = event.key
+            board.keyd(key)
+        elif event.type == pygame.KEYUP:
+            kdown = False
+            key = False
+    if kdown:
+        board.keyd(key)
     screen.fill((150, 150, 150))
     board.render()
     if board.gamecon:
