@@ -48,7 +48,7 @@ def ok(x, a, b, board,
 class Map:
     # создание поля
     def __init__(self, width, height):  # высота, ширина
-        self.boomarea = False
+        self.boomarea = []
         self.points = 0
         self.time = 0
         self.dethtime = 120
@@ -108,7 +108,7 @@ class Map:
         # print(len(self.enemy), height * width // 19)
 
         self.board[1][1] = 1  # персонаж
-        self.pers = [1, 1, 0, 0]  # координаты персонажа
+        self.pers = [1, 1, 4, 0]  # координаты персонажа
 
         self.bomb = False
         self.boom = False
@@ -131,7 +131,7 @@ class Map:
         self.fps = (self.fps + 1) % self.fpsall
         a = self.board
         if self.board[self.pers[0]][self.pers[1]] != 1:
-            self.gamecon = False
+            self.pers[2] = 0
         if self.fps == 0:
             for i in range(len(self.enemy)):
                 if self.enemy[i]:
@@ -180,14 +180,18 @@ class Map:
                         for i in w:
                             if False not in g:
                                 if self.board[i[0]][i[1]] == [4, 5]:
+                                    self.boomarea.append([i[0], i[1], 0])
                                     self.board[i[0]][i[1]] = 5
                                 elif self.board[i[0]][i[1]] == [4, 6]:
+                                    self.boomarea.append([i[0], i[1], 0])
                                     self.board[i[0]][i[1]] = 6
                                 elif self.board[i[0]][i[1]] == [4, 7]:
+                                    self.boomarea.append([i[0], i[1], 0])
                                     self.board[i[0]][i[1]] = 7
                                 elif self.board[i[0]][i[1]] not in [-1, 5, 6,
                                                                     7]:
                                     self.board[i[0]][i[1]] = 0
+                                    self.boomarea.append([i[0], i[1], 0])
                                     for e in range(len(self.enemy)):
                                         if self.enemy[e] and self.enemy[e][
                                             0] == i[
@@ -212,13 +216,17 @@ class Map:
                                         i[1] < self.bomb[b][1] and g[
                                     3]) or i == self.bomb[b]:
                                     if self.board[i[0]][i[1]] == [4, 5]:
+                                        self.boomarea.append([i[0], i[1], 0])
                                         self.board[i[0]][i[1]] = 5
                                     elif self.board[i[0]][i[1]] == [4, 6]:
+                                        self.boomarea.append([i[0], i[1], 0])
                                         self.board[i[0]][i[1]] = 6
                                     elif self.board[i[0]][i[1]] == [4, 7]:
+                                        self.boomarea.append([i[0], i[1], 0])
                                         self.board[i[0]][i[1]] = 7
                                     elif self.board[i[0]][i[1]] not in [-1, 5,
                                                                         6, 7]:
+                                        self.boomarea.append([i[0], i[1], 0])
                                         self.board[i[0]][i[1]] = 0
                                         for e in range(len(self.enemy)):
                                             if self.enemy[e] and self.enemy[e][
@@ -278,18 +286,72 @@ class Map:
                             self.top + i * self.cell_size,
                             self.left + j * self.cell_size, self.cell_size,
                             self.cell_size), 1)
-                        # pygame.draw.circle(screen, (80, 80, 255), (
-                        #     self.top + i * self.cell_size + self.cell_size // 2,
-                        #     self.left + j * self.cell_size + self.cell_size // 2),
-                        #                    self.cell_size // 2 - 2, self.cell_size // 7)
-
-                        hero = pygame.image.load('76829.png')
-                        # hero_rect = hero.get_rect(center=(self.top + i * self.cell_size + self.cell_size // 2, self.left + j * self.cell_size + self.cell_size // 2))
-                        hero_rect = (
-                        self.top + i * self.cell_size + self.cell_size // 2 - 29 // 2 + 5,
-                        self.left + j * self.cell_size + self.cell_size // 2 - 29 // 2 + 3)
-                        screen.blit(hero, hero_rect, (0, 0, 29, 29))
-                    elif self.board[i][j] == -1:
+                        if self.pers[2] == 0 and self.pers[3] == 0:
+                            print('\t', self.pers)
+                            pygame.quit()
+                        else:
+                            # pygame.draw.circle(screen, (80, 80, 255), (
+                            #     self.top + i * self.cell_size + self.cell_size // 2,
+                            #     self.left + j * self.cell_size + self.cell_size // 2),
+                            #                    self.cell_size // 2 - 2, self.cell_size // 7)
+                            imgs = [['pers07.png', 'pers06.png', 'pers05.png', 'pers04.png', 'pers03.png', 'pers02.png', 'pers01.png', 'pers00.png'], ['pers10.png', 'pers11.png', 'pers12.png', 'pers11.png', 'pers10.png'], ['pers20.png', 'pers21.png', 'pers22.png', 'pers21.png', 'pers20.png'], ['pers30.png', 'pers31.png', 'pers32.png', 'pers31.png', 'pers30.png'], ['pers40.png', 'pers41.png', 'pers42.png', 'pers41.png', 'pers40.png']]
+                            # hero_rect = hero.get_rect(center=(self.top + i * self.cell_size + self.cell_size // 2, self.left + j * self.cell_size + self.cell_size // 2))
+                            if self.pers[2] == 0:
+                                print(self.pers)
+                                hero = pygame.image.load(
+                                    imgs[self.pers[2]][self.pers[3] // (self.cell_size // 7)])
+                                hero = pygame.transform.scale(hero, (
+                                self.cell_size, self.cell_size))
+                                hero_rect = hero.get_rect(center=(
+                                    self.top + i * self.cell_size + self.cell_size // 2,
+                                    self.left + j * self.cell_size + self.cell_size // 2))
+                            else:
+                                hero = pygame.image.load(
+                                    imgs[self.pers[2]][self.pers[3] // (self.cell_size // 4)])
+                                hero = pygame.transform.scale(hero, (
+                                self.cell_size, self.cell_size))
+                            if self.pers[2] == 1:
+                                if self.pers[3] == self.cell_size:
+                                    print(self.pers)
+                                    self.pers[0] = i + 1
+                                    self.pers[1] = j
+                                hero_rect = hero.get_rect(center=(
+                                    self.top + i * self.cell_size + self.cell_size // 2 -
+                                    self.pers[3],
+                                    self.left + j * self.cell_size + self.cell_size // 2))
+                            elif self.pers[2] == 2:
+                                if self.pers[3] == self.cell_size:
+                                    self.pers[0] = i - 1
+                                    self.pers[1] = j
+                                hero_rect = hero.get_rect(center=(
+                                    self.top + i * self.cell_size + self.cell_size // 2 +
+                                    self.pers[3],
+                                    self.left + j * self.cell_size + self.cell_size // 2))
+                            elif self.pers[2] == 3:
+                                if self.pers[3] == self.cell_size:
+                                    self.pers[0] = i
+                                    self.pers[1] = j - 1
+                                hero_rect = hero.get_rect(center=(
+                                    self.top + i * self.cell_size + self.cell_size // 2,
+                                    self.left + j * self.cell_size + self.cell_size // 2 +
+                                    self.pers[3]))
+                            elif self.pers[2] == 4:
+                                if self.pers[3] == self.cell_size:
+                                    self.pers[0] = i
+                                    self.pers[1] = j + 1
+                                hero_rect = hero.get_rect(center=(
+                                    self.top + i * self.cell_size + self.cell_size // 2,
+                                    self.left + j * self.cell_size + self.cell_size // 2 -
+                                    self.pers[3]))
+                            self.board[i][j] = 0
+                            self.board[self.pers[0]][self.pers[1]] = 1
+                            screen.blit(hero, hero_rect, (0, 0, 29, 29))
+                            if self.pers[3] > 3:
+                                self.pers[3] -= 4
+                            elif 0 < self.pers[3] < 4:
+                                self.pers[3] -= 1
+                    elif self.board[i][
+                        j] == -1:
                         pygame.draw.rect(screen, (100, 100, 100), (
                             self.top + i * self.cell_size,
                             self.left + j * self.cell_size, self.cell_size,
@@ -394,6 +456,72 @@ class Map:
                         self.left + b[
                             1] * self.cell_size + self.cell_size // 2 - 29 // 2)
                     screen.blit(bomb, bomb_rect, (29 * 6, 29 * 3, 29, 29))
+                    
+        if self.boomarea:
+            i = 0
+            for i in range(len(self.boomarea)):
+                # boom = pygame.image.load("boom.png")
+                # boom = pygame.transform.scale(boom, (self.cell_size, self.cell_size))
+                # boom.set_colorkey((255, 255, 255))
+                # boom_rect = boom.get_rect(center=((
+                #             self.top + self.boomarea[i][
+                #                 0] * self.cell_size + self.cell_size // 2,
+                #             self.left + self.boomarea[i][
+                #                 1] * self.cell_size + self.cell_size // 2)))
+                # screen.blit(boom, boom_rect)
+                # self.boomarea[i][2] += 1
+                # if self.boomarea[i][2] >= self.fpsall // 3:
+                #     self.boomarea[i] = False
+
+                bar = []
+                for j in self.boomarea:
+                    bar.append([j[0], j[1]])
+                x = -1
+                if [self.boomarea[i][0] - 1, self.boomarea[i][1]] in bar and [self.boomarea[i][0] + 1, self.boomarea[i][1]] in bar and [self.boomarea[i][0], self.boomarea[i][1] - 1] in bar and [self.boomarea[i][0], self.boomarea[i][1] + 1] in bar:
+                    x = 0
+                elif ([self.boomarea[i][0] + 1, self.boomarea[i][1]] in bar and [self.boomarea[i][0] - 1, self.boomarea[i][1]] in bar and [self.boomarea[i][0], self.boomarea[i][1] + 1] in bar) or ([self.boomarea[i][0] + 1, self.boomarea[i][1]] in bar and [self.boomarea[i][0] - 1, self.boomarea[i][1]] in bar and [self.boomarea[i][0], self.boomarea[i][1] - 1] in bar) or  ([self.boomarea[i][0], self.boomarea[i][1] + 1] in bar and [self.boomarea[i][0], self.boomarea[i][1] - 1] in bar and [self.boomarea[i][0] + 1, self.boomarea[i][1]] in bar) or ([self.boomarea[i][0], self.boomarea[i][1] + 1] in bar and [self.boomarea[i][0], self.boomarea[i][1] - 1] in bar and [self.boomarea[i][0] - 1, self.boomarea[i][1]] in bar):
+                    x = 0
+                elif [self.boomarea[i][0] - 1, self.boomarea[i][1]] in bar and [self.boomarea[i][0], self.boomarea[i][1] + 1] in bar or [self.boomarea[i][0] + 1, self.boomarea[i][1]] in bar and [self.boomarea[i][0], self.boomarea[i][1] - 1] in bar or [self.boomarea[i][0] + 1, self.boomarea[i][1]] in bar and [self.boomarea[i][0], self.boomarea[i][1] + 1] in bar or [self.boomarea[i][0] - 1, self.boomarea[i][1]] in bar and [self.boomarea[i][0], self.boomarea[i][1] - 1] in bar:
+                    x = 0
+                elif [self.boomarea[i][0] + 1, self.boomarea[i][1]] in bar and [self.boomarea[i][0] - 1, self.boomarea[i][1]] in bar:
+                    x = 5
+                elif [self.boomarea[i][0], self.boomarea[i][1] + 1] in bar and [self.boomarea[i][0], self.boomarea[i][1] - 1] in bar:
+                    x = 6
+                elif [self.boomarea[i][0] - 1, self.boomarea[i][1]] in bar:
+                    x = 2
+                elif [self.boomarea[i][0] + 1, self.boomarea[i][1]] in bar:
+                    x = 1
+                elif [self.boomarea[i][0], self.boomarea[i][1] + 1] in bar:
+                    x = 3
+                elif [self.boomarea[i][0], self.boomarea[i][1] - 1] in bar:
+                    x = 4
+                cd = self.boomarea[i][2] // (self.fpsall // 3 // 3) + 1
+                zero = pygame.image.load("center" + str(cd) + '.png')
+                one = pygame.image.load("end" + str(cd) + ".png")
+                two = pygame.transform.rotate(one, 180)
+                tree = pygame.transform.rotate(two, 90)
+                four = pygame.transform.rotate(two, -90)
+                five = pygame.image.load("middle" + str(cd) + ".png")
+                six = pygame.transform.rotate(five, 90)
+                dgr = [zero, one, two, tree, four, five, six]
+                boom = pygame.transform.scale(dgr[x],
+                                              (self.cell_size, self.cell_size))
+                boom_rect = boom.get_rect(center=((
+                    self.top + self.boomarea[i][
+                        0] * self.cell_size + self.cell_size // 2,
+                    self.left + self.boomarea[i][
+                        1] * self.cell_size + self.cell_size // 2)))
+                screen.blit(boom, boom_rect)
+                self.boomarea[i][2] += 1
+            for i in range(len(self.boomarea)):
+                if self.boomarea[i][2] >= self.fpsall // 3:
+                    self.boomarea[i] = False
+            b = 0
+            while False in self.boomarea:
+                if self.boomarea[b]:
+                    b += 1
+                else:
+                    del self.boomarea[b]
 
     def get_cell(self, pos):
         y = pos[0] - self.top
@@ -411,49 +539,57 @@ class Map:
 
     def keyd(self, key):
         a = self.pers.copy()
-        kk = [[pygame.K_RIGHT, pygame.K_d, [a[0] + 1, a[1]]],
-              [pygame.K_LEFT, pygame.K_a, [a[0] - 1, a[1]]],
-              [pygame.K_UP, pygame.K_w, [a[0], a[1] - 1]],
-              [pygame.K_DOWN, pygame.K_s, [a[0], a[1] + 1]]]
+        kk = [[pygame.K_RIGHT, pygame.K_d, [a[0] + 1, a[1]], 1],
+              [pygame.K_LEFT, pygame.K_a, [a[0] - 1, a[1]], 2],
+              [pygame.K_UP, pygame.K_w, [a[0], a[1] - 1], 3],
+              [pygame.K_DOWN, pygame.K_s, [a[0], a[1] + 1], 4]]
         if type(self.bomb) != list:
             bomb = [self.bomb]
         else:
             bomb = self.bomb.copy()
-        for i in kk:
-            if (key == i[0] or key == i[1]) and self.board[i[2][0]][
-                i[2][1]] in [0, 3, 5, 6, 7] and i[2] not in bomb:
-                if self.board[i[2][0]][i[2][1]] == 3:
-                    self.gamecon = False
-                    print('THE END')
-                elif self.board[i[2][0]][i[2][1]] == 5:
-                    self.bonus1 += 1
-                    self.board[a[0]][a[1]] = 0
-                    self.pers = i[2]
-                    self.board[i[2][0]][i[2][1]] = 1
-                elif self.board[i[2][0]][i[2][1]] == 6:
-                    self.bonus2 += 1
-                    self.board[a[0]][a[1]] = 0
-                    self.pers = i[2]
-                    self.board[i[2][0]][i[2][1]] = 1
-                elif self.board[i[2][0]][i[2][1]] == 7:
-                    print('You win!')
-                    self.gamecon = False
-                else:
-                    self.board[a[0]][a[1]] = 0
-                    self.pers = i[2]
-                    self.board[i[2][0]][i[2][1]] = 1
-            elif key == pygame.K_SPACE:
-                if self.bomb:
-                    if self.pers not in self.bomb:
-                        if len(self.bomb) < self.bonus1 + 1:
-                            self.bomb.append(a)
-                            self.boom.append(self.fps)
-                else:
-                    self.bomb = [a]
-                    self.boom = [self.fps]
-            elif key == pygame.K_x:
-                print('You left the game')
-                self.gamecon = False
+        if a[2] != 0 and a[3] == 0:
+            for i in kk:
+                if (key == i[0] or key == i[1]) and self.board[i[2][0]][
+                    i[2][1]] in [0, 3, 5, 6, 7] and i[2] not in bomb:
+                    if self.board[i[2][0]][i[2][1]] == 3:
+                        self.pers[2] = 0
+                        print('THE END')
+                    elif self.board[i[2][0]][i[2][1]] == 5:
+                        self.bonus1 += 1
+                        # self.board[a[0]][a[1]] = 0
+                        # # self.pers = i[2]
+                        # self.board[i[2][0]][i[2][1]] = 1
+                        self.pers[3] = self.cell_size
+                        self.pers[2] = i[3]
+                    elif self.board[i[2][0]][i[2][1]] == 6:
+                        self.bonus2 += 1
+                        # self.board[a[0]][a[1]] = 0
+                        # # self.pers = i[2]
+                        # self.board[i[2][0]][i[2][1]] = 1
+                        self.pers[3] = self.cell_size
+                        self.pers[2] = i[3]
+                    elif self.board[i[2][0]][i[2][1]] == 7:
+                        if self.points > 500:
+                            print('You win!')
+                            self.gamecon = False
+                    else:
+                        # self.board[a[0]][a[1]] = 0
+                        # # self.pers = i[2]
+                        # self.board[i[2][0]][i[2][1]] = 1
+                        self.pers[3] = self.cell_size
+                        self.pers[2] = i[3]
+        if key == pygame.K_SPACE:
+            if self.bomb:
+                if self.pers not in self.bomb:
+                    if len(self.bomb) < self.bonus1 + 1:
+                        self.bomb.append(a)
+                        self.boom.append(self.fps)
+            else:
+                self.bomb = [a]
+                self.boom = [self.fps]
+        elif key == pygame.K_x:
+            print('You left the game')
+            self.pers[2] = 0
 
 
 app = QApplication(sys.argv)
@@ -470,12 +606,23 @@ screen.fill((150, 150, 150))
 running = True
 kdown = False
 key = False
+time = 0
 while running and board.gamecon:
+    time += 1
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.KEYDOWN:
             board.keyd(event.key)
+    #     if event.type == pygame.KEYDOWN:
+    #         kdown = True
+    #         key = event.key
+    #         board.keyd(key)
+    #     elif event.type == pygame.KEYUP:
+    #         kdown = False
+    #         key = False
+    # if kdown and time % (fps // 4) == 0:
+    #     board.keyd(key)
     screen.fill((150, 150, 150))
     board.render()
     if board.gamecon:
