@@ -46,14 +46,14 @@ def ok(x, a, b, board,
 
 class Map:
     # создание поля
-    def __init__(self, width, height):  # высота, ширина
+    def __init__(self, width, height, bonus1=0, bonus2=0, life=3, time=0, top=10, left=10, cell_size=30, fpsall=30):  # высота, ширина
         self.boomarea = []
         self.points = 0
-        self.time = 0
-        self.dethtime = 180
-        self.life = 3
-        self.bonus1 = 0  # +1 бомба
-        self.bonus2 = 0  # +1 к диапазону взрыва
+        self.time = time
+        self.dethtime = 240
+        self.life = life
+        self.bonus1 = bonus1  # +1 бомба
+        self.bonus2 = bonus2  # +1 к диапазону взрыва
         self.width = width
         self.height = height
         self.fps = 0
@@ -114,9 +114,10 @@ class Map:
         self.boom = False
 
         # значения по умолчанию
-        self.left = 10
-        self.top = 10
-        self.cell_size = 30
+        self.left = left
+        self.top = top
+        self.cell_size = cell_size
+        self.fpsall = fpsall
 
     # настройка внешнего вида
     def set_view(self, left, top, cell_size, fps=30):
@@ -568,7 +569,11 @@ class Map:
                                     self.cell_size), 1)
                                 screen.blit(enemy, enemy_rect)
                 else:
-                    pygame.quit()
+                    if self.life == 1:
+                        pygame.quit()
+                    else:
+                        self.set_view(self.left, self.top, self.cell_size, self.fpsall)
+                        self.__init__(self.width, self.height, self.bonus1, self.bonus2, self.life - 1, self.time, self.top, self.left, self.cell_size, self.fpsall)
 
         if self.gamecon:
             if self.bomb:
@@ -581,11 +586,11 @@ class Map:
                         bmb = ["bomb1.png", "bomb1.png", "bomb1.png", "bomb2.png", "bomb2.png", "bomb3.png"]
                         bomb = pygame.image.load(random.choice(bmb))
                         bomb = pygame.transform.scale(bomb, (self.cell_size, self.cell_size))
-                        bomb_rect = (
+                        bomb_rect = bomb.get_rect(center=(
                             self.top + b[
-                                0] * self.cell_size + self.cell_size // 2 - 29 // 2,
+                                0] * self.cell_size + self.cell_size // 2,
                             self.left + b[
-                                1] * self.cell_size + self.cell_size // 2 - 29 // 2)
+                                1] * self.cell_size + self.cell_size // 2))
                         screen.blit(bomb, bomb_rect)
 
             if self.boomarea:
@@ -726,15 +731,17 @@ class Map:
 
 
 # menu
-app = QApplication(sys.argv)
-q = QDesktopWidget().availableGeometry()
-x = q.width() * q.height() // 42500
-fps = x  # количество кадров в секунду
+# app = QApplication(sys.argv)
+# q = QDesktopWidget().availableGeometry()
+# x = q.width() * q.height() // 42500
+# print(q.width(), q.height(), x)
+x = 29
+fps = x # количество кадров в секунду
 clock = pygame.time.Clock()
 pygame.init()
 size = width, height = 35 * x, 15 * x
 board = Map(13, 35)
-board.set_view(x * 2, 0, x, x)
+board.set_view(x * 2, 0, x, fps)
 screen = pygame.display.set_mode(size)
 screen.fill((150, 150, 150))
 running = True
@@ -748,5 +755,5 @@ while running and board.gamecon:
     board.render()
     if board.gamecon:
         pygame.display.flip()
-        clock.tick(fps)
+    clock.tick(fps)
 # menu
