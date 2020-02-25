@@ -1,5 +1,6 @@
 import pygame
 import random
+import math
 import sys
 from PyQt5.QtWidgets import QDesktopWidget, QApplication
 
@@ -319,7 +320,7 @@ class Map:
                             if self.pers[2] == 0:
                                 # print(self.pers)
                                 hero = pygame.image.load(
-                                    imgs[self.pers[2]][self.pers[3] // (self.cell_size // 7)])
+                                    imgs[self.pers[2]][math.ceil(self.pers[3] / self.fpsall * 9) - 1])
                                 hero = pygame.transform.scale(hero, (
                                 self.cell_size, self.cell_size))
                                 hero_rect = hero.get_rect(center=(
@@ -328,8 +329,10 @@ class Map:
                                 if self.pers[3] == 0:
                                     self.pers[3] = -1
                             else:
+                                # if self.pers[3] != 0:
+                                    # print(self.pers[3], round(self.pers[3] / self.cell_size * 4) - 1)
                                 hero = pygame.image.load(
-                                    imgs[self.pers[2]][self.pers[3] // (self.cell_size // 4)])
+                                    imgs[self.pers[2]][round(self.pers[3] / self.fpsall * 4) - 1])
                                 hero = pygame.transform.scale(hero, (
                                 self.cell_size, self.cell_size))
                             if self.pers[2] == 1:
@@ -364,8 +367,8 @@ class Map:
                             self.board[i][j] = 0
                             self.board[self.pers[0]][self.pers[1]] = 1
                             screen.blit(hero, hero_rect)
-                            if self.pers[3] >= self.cell_size // 4:
-                                self.pers[3] -= self.cell_size // 4
+                            if self.pers[3] >= round(self.fps / self.fpsall * self.cell_size):
+                                self.pers[3] -= round(self.fps / self.fpsall * self.cell_size)
                             elif 0 < self.pers[3] < self.cell_size // 4:
                                 self.pers[3] -= 1
                     elif self.board[i][
@@ -459,8 +462,7 @@ class Map:
                                                   "enemy04.png", "enemy03.png",
                                                   "enemy02.png", "enemy01.png"]
                                             enemy = pygame.image.load(
-                                                en[(self.fps // (
-                                                            self.fpsall // 9) - 1) % 6])
+                                                en[round(self.fps / self.fpsall * self.cell_size) % 6])
                                             enemy = pygame.transform.scale(enemy, (
                                             self.cell_size, self.cell_size))
                                             enemy_rect = enemy.get_rect(center=(
@@ -484,13 +486,13 @@ class Map:
                             if type(self.enemy[p]) not in [bool, int]:
                                 en = ["enemy1.png", "enemy2.png", "enemy3.png"]
                                 enemy = pygame.image.load(
-                                    en[(self.fps // (self.fpsall // 9) - 1) % 3])
+                                    en[round(self.fps / self.fpsall * self.cell_size) % 3])
                                 enemy = pygame.transform.scale(enemy, (self.cell_size, self.cell_size))
                                 enemy_rect = enemy.get_rect(center=(
                                     self.top + self.enemy[p][0] * self.cell_size + self.cell_size // 2 + ex * (
-                                            self.cell_size // self.fpsall * self.fps),
+                                            round(self.fps / self.fpsall * self.cell_size)),
                                     self.left + h[1] * self.cell_size + self.cell_size // 2 + ey * (
-                                            self.cell_size // self.fpsall * self.fps)))
+                                            round(self.fps / self.fpsall * self.cell_size))))
                                 pygame.draw.rect(screen, (200, 200, 200), (
                                     self.top + i * self.cell_size,
                                     self.left + j * self.cell_size, self.cell_size,
@@ -527,8 +529,7 @@ class Map:
                                                   "enemy04.png", "enemy03.png",
                                                   "enemy02.png", "enemy01.png"]
                                             enemy = pygame.image.load(
-                                                en[(self.fps // (
-                                                        self.fpsall // 9) - 1) % 6])
+                                                en[round(self.fps / self.fpsall * self.cell_size) % 6])
                                             enemy = pygame.transform.scale(
                                                 enemy, (
                                                     self.cell_size,
@@ -553,8 +554,7 @@ class Map:
                             if type(self.enemy[p]) not in [bool, int]:
                                 en = ["enemy1.png", "enemy2.png", "enemy3.png"]
                                 enemy = pygame.image.load(
-                                    en[(self.fps // (
-                                                self.fpsall // 9) - 1) % 3])
+                                    en[round(self.fps / self.fpsall * self.cell_size) % 3])
                                 enemy = pygame.transform.scale(enemy, (
                                 self.cell_size, self.cell_size))
                                 enemy_rect = enemy.get_rect(center=(
@@ -736,7 +736,7 @@ class Map:
 # x = q.width() * q.height() // 42500
 # print(q.width(), q.height(), x)
 x = 29
-fps = x # количество кадров в секунду
+fps = 120 # количество кадров в секунду
 clock = pygame.time.Clock()
 pygame.init()
 size = width, height = 35 * x, 15 * x
