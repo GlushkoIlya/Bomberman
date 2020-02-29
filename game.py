@@ -90,7 +90,6 @@ class Map:
             while self.board[x][y] != 0 or [x, y] in f:
                 x = random.choice(range(height))
                 y = random.choice(range(width))
-            # print(x, y, f)
             if i == 0:
                 self.board[x][y] = [4, 5]  # +1 бомба
             elif i == 2:
@@ -110,8 +109,6 @@ class Map:
             self.board[x][y] = 3
             self.enemy.append([x, y, 0])
         self.enemycopy = self.enemy.copy()
-        # print(len(self.enemy), height * width // 19)
-
         self.board[1][1] = 1  # персонаж
         self.pers = [1, 1, 4, 0]  # координаты персонажа
 
@@ -160,7 +157,6 @@ class Map:
                                             self.board)
                                     if [kk[0], kk[1]] == [k[0], k[1]]:
                                         vll = False
-                                        # print(k, kk)
                             if vll:
                                 self.enemy[i][2] = x
                                 break
@@ -214,7 +210,6 @@ class Map:
                                                 self.enemy[e][1] == i[1]:
                                             self.enemy[e] = (self.fpsall + (
                                                     self.fps - 1)) % self.fpsall
-                                            # print(self.enemy[e])
                                             self.board[i[0]][i[1]] = 3
                                             self.points += 100
                                 else:
@@ -256,7 +251,6 @@ class Map:
                                                 self.enemy[e] = (
                                                                         self.fpsall + (
                                                                         self.fps - 1)) % self.fpsall
-                                                # print(self.enemy[e])
                                                 self.board[i[0]][i[1]] = 3
                                                 self.points += 100
                                     else:
@@ -296,7 +290,6 @@ class Map:
                 self.height * self.cell_size, round(self.cell_size * 1.5)))
             screen.blit(text, (0, 0))
         if self.pers[2] == 0 and self.pers[3] == 0:
-            # print(self.pers)
             pass
         elif self.pers[2] == 0:
             self.board[self.pers[0]][self.pers[1]] = 1
@@ -332,7 +325,6 @@ class Map:
                             self.gamecon = False
                         else:
                             if self.pers[2] == 0:
-                                # print(self.pers)
                                 hero = pygame.image.load(imgs[self.pers[2]][
                                                              round(
                                                                  self.cell_size / (
@@ -357,7 +349,6 @@ class Map:
                                     self.cell_size, self.cell_size))
                             if self.pers[2] == 1:
                                 if self.pers[3] == self.cell_size:
-                                    # print(self.pers)
                                     self.pers[0] += 1
                                 hero_rect = hero.get_rect(center=(
                                     self.top + self.pers[
@@ -395,8 +386,9 @@ class Map:
                             screen.blit(hero, hero_rect)
                             if self.pers[3] >= round(
                                     self.cell_size / 0.1 / self.fpsall):
-                                self.pers[3] -= round(
-                                    self.cell_size / 0.1 / self.fpsall)
+                                if self.pers[3] % round(self.cell_size / 0.1 / self.fpsall):
+                                    self.pers[3] -= round(
+                                        self.cell_size / 0.1 / self.fpsall)
                             elif 0 < self.pers[3] < round(
                                     self.cell_size / 0.1 / self.fpsall):
                                 self.pers[3] -= 1
@@ -514,7 +506,6 @@ class Map:
                                                              1)
                                             screen.blit(enemy, enemy_rect)
                                         else:
-                                            # print(self.enemy[p])
                                             self.board[i][j] = 0
                                             self.enemy[p] = False
                             if bll:
@@ -587,7 +578,6 @@ class Map:
                                                              1)
                                             screen.blit(enemy, enemy_rect)
                                         else:
-                                            # print(self.enemy[p])
                                             self.board[i][j] = 0
                                             self.enemy[p] = False
 
@@ -742,7 +732,7 @@ class Map:
                         self.left + self.boomarea[i][
                             1] * self.cell_size + self.cell_size // 2)))
                     screen.blit(boom, boom_rect)
-                    self.boomarea[i][2] += 1
+                    self.boomarea[i][2] += round(self.cell_size / 0.1 / self.fpsall)
                 for i in range(len(self.boomarea)):
                     if self.boomarea[i][2] >= self.fpsall // 3:
                         self.boomarea[i] = False
@@ -783,7 +773,6 @@ class Map:
                     if self.board[i[2][0]][i[2][1]] == 3:
                         self.pers[2] = 0
                         self.pers[3] = self.cell_size
-                        print('THE END')
                     elif self.board[i[2][0]][i[2][1]] == 5:
                         self.bonus1 += 1
                         # self.board[a[0]][a[1]] = 0
@@ -800,7 +789,6 @@ class Map:
                         self.pers[2] = i[3]
                     elif self.board[i[2][0]][i[2][1]] == 7:
                         if self.points > 500:
-                            print('You win!')
                             self.gamecon = False
                     else:
                         # self.board[a[0]][a[1]] = 0
@@ -818,21 +806,17 @@ class Map:
                 self.bomb = [a]
                 self.boom = [self.fps]
         elif key == pygame.K_x:
-            print('You left the game')
             self.pers[2] = 0
             self.pers[3] = self.cell_size
 
 
 def start(gx, gy, gfps=60):
-    app = QApplication(sys.argv)
-    q = QDesktopWidget().availableGeometry()
-    x = q.width() * q.height() // 42500
-    fps = gfps  # количество кадров в секунду
     clock = pygame.time.Clock()
     pygame.init()
     size = width, height = gx * x, (gy + 2) * x
     board = Map(gy, gx)
-    board.set_view(x * 2, 0, x, fps)
+    board.set_view(x * 2, 0, x, gfps)
+    print(board.fpsall, gfps, board.cell_size)
     screen = pygame.display.set_mode(size)
     screen.fill((150, 150, 150))
     running = True
@@ -843,16 +827,16 @@ def start(gx, gy, gfps=60):
             if event.type == pygame.KEYDOWN:
                 board.keyd(event.key)
         screen.fill((150, 150, 150))
-        board.render()
-        if board.gamecon:
+        try:
+            board.render()
             pygame.display.flip()
-        clock.tick(fps)
+        except:
+            pass
+        clock.tick(board.fpsall)
+    menu()
 
 
 def menu():
-    app = QApplication(sys.argv)
-    q = QDesktopWidget().availableGeometry()
-    x = q.width() * q.height() // 42500
     fps = x
     clock = pygame.time.Clock()
     pygame.init()
@@ -879,6 +863,7 @@ def menu():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+                exit(0)
             if event.type == pygame.KEYDOWN:
                 h = [pygame.K_0, pygame.K_1, pygame.K_2, pygame.K_3,
                      pygame.K_4, pygame.K_5, pygame.K_6, pygame.K_7,
@@ -895,7 +880,7 @@ def menu():
                             gy = gy // 10
                         else:
                             gy = gy * 10 + k
-                    elif vv == 3 and (k == 10 or gfps * 10 + k <= 200):
+                    elif vv == 3 and (k == 10 or gfps * 10 + k <= 144):
                         if k == 10:
                             gfps = gfps // 10
                         else:
@@ -904,14 +889,17 @@ def menu():
                     vv = (vv + 1) % 3 + 1
                 elif event.key == pygame.K_KP_ENTER or event.key == pygame.K_RETURN:
                     if len(bt) == 4:
-                        start(gx, gy, gfps)
+                        try:
+                            start(gx, gy, gfps)
+                        except:
+                            pass
             if event.type == pygame.MOUSEBUTTONDOWN:
                 d = get_cell(event.pos[0], event.pos[1], bt)
                 if d != -1:
                     vv = d + 1
                 if d + 1 == 4:
                     start(gx, gy, gfps)
-        if gx != 0 and gy != 0 and gfps != 0 and len(bt) == 3:
+        if gx > 6 and gy > 5 and gfps > 10 and len(bt) == 3:
             bt.append([5 * x + 2 * x, 10 * x, 5 * x + 2 * x + 4 * x,
                        10 * x + x * 0.9])
         elif gx == 0 or gy == 0 or gfps == 0 and len(bt) == 4:
@@ -955,15 +943,12 @@ def menu():
 
 
 def win():
-    app = QApplication(sys.argv)
-    q = QDesktopWidget().availableGeometry()
-    x = q.width() * q.height() // 42500
     pygame.init()
     size = width, height = 6 * x, round(x * 1.5)
     screen2 = pygame.display.set_mode(size)
-    screen2.fill((150, 150, 150))
+    screen2.fill((200, 200, 200))
     font = pygame.font.Font("18999.otf", 50)
-    text = font.render('YOU WIN!', 1, (250, 250, 250))
+    text = font.render('YOU WIN!', 1, (50, 200, 50))
     text = pygame.transform.scale(text, (4 * x, x))
     screen2.blit(text, (x, 0))
     pygame.display.flip()
@@ -972,17 +957,18 @@ def win():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+    try:
+        menu()
+    except:
+        pass
 
 def lose():
-    app = QApplication(sys.argv)
-    q = QDesktopWidget().availableGeometry()
-    x = q.width() * q.height() // 42500
     pygame.init()
     size = width, height = 6 * x, round(x * 1.5)
     screen2 = pygame.display.set_mode(size)
     screen2.fill((150, 150, 150))
     font = pygame.font.Font("18999.otf", 50)
-    text = font.render('YOU LOSE!', 1, (250, 250, 250))
+    text = font.render('YOU LOSE!', 1, (200, 0, 0))
     text = pygame.transform.scale(text, (4 * x, x))
     screen2.blit(text, (x, 0))
     pygame.display.flip()
@@ -991,10 +977,17 @@ def lose():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+    menu()
 
 
-screen = pygame.display.set_mode((0, 0))
-screen1 = pygame.display.set_mode((0, 0))
-
-# win()
-menu()
+screen = pygame.display.set_mode((1, 1))
+screen1 = pygame.display.set_mode((1, 1))
+app = QApplication(sys.argv)
+q = QDesktopWidget().availableGeometry()
+x = q.width() // 40
+print(q.width(), q.height(), x, q.width() // 30)
+v = 0
+if v == 0:
+    menu()
+    exit(0)
+    v += 1
