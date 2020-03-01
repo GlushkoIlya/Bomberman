@@ -732,7 +732,7 @@ class Map:
                         self.left + self.boomarea[i][
                             1] * self.cell_size + self.cell_size // 2)))
                     screen.blit(boom, boom_rect)
-                    self.boomarea[i][2] += round(self.cell_size / 0.1 / self.fpsall)
+                    self.boomarea[i][2] += 1
                 for i in range(len(self.boomarea)):
                     if self.boomarea[i][2] >= self.fpsall // 3:
                         self.boomarea[i] = False
@@ -898,6 +898,7 @@ def menu():
                 if d != -1:
                     vv = d + 1
                 if d + 1 == 4:
+                    ranning = False
                     start(gx, gy, gfps)
         if gx > 6 and gy > 5 and gfps > 10 and len(bt) == 3:
             bt.append([5 * x + 2 * x, 10 * x, 5 * x + 2 * x + 4 * x,
