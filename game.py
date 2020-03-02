@@ -816,7 +816,6 @@ def start(gx, gy, gfps=60):
     size = width, height = gx * x, (gy + 2) * x
     board = Map(gy, gx)
     board.set_view(x * 2, 0, x, gfps)
-    print(board.fpsall, gfps, board.cell_size)
     screen = pygame.display.set_mode(size)
     screen.fill((150, 150, 150))
     running = True
@@ -986,7 +985,6 @@ screen1 = pygame.display.set_mode((1, 1))
 app = QApplication(sys.argv)
 q = QDesktopWidget().availableGeometry()
 x = q.width() // 40
-print(q.width(), q.height(), x, q.width() // 30)
 v = 0
 if v == 0:
     menu()
